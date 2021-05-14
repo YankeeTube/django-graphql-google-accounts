@@ -8,11 +8,12 @@ from django.db import models
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
-    def create_user(self, email, password=None):
+    def create_user(self, email):
         if not email:
             raise ValueError('email is required...!')
 
         user = self.model(email=self.normalize_email(email))
+        user.set_password(email)
         user.save(using=self._db)
         return user
 
@@ -27,11 +28,13 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
     uid = models.CharField(max_length=100, unique=True, blank=True, null=True, help_text='Google provider uid')
     email = models.EmailField(max_length=255, unique=True, blank=False, null=False)
+    password = models.CharField(max_length=128)
     nickname = models.CharField(max_length=20, null=True, blank=True, unique=True)
     picture = models.CharField(max_length=255, blank=True, null=True, help_text='Google Profile Thumbnail')
     locale = models.CharField(max_length=4, default='ko', blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    last_login = models.DateTimeField(auto_now=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -58,6 +61,11 @@ class User(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
+
+    def save(self, *args, **kwargs):
+        if not self.password:
+            self.set_password(self.email)
+        super().save(*args, **kwargs)
 
 
 class RefreshTokens(models.Model):
