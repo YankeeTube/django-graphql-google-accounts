@@ -1,0 +1,2 @@
+# django migrations ignore
+*/migrations/*_initial.py
