@@ -16,13 +16,20 @@ class VerifyTokenAuthenticate(JSONWebToken):
 
     def __call__(self, root, info, *args, **kwargs):
         result = self.func(root, info, *args, **kwargs)
-
         ctx = info.context
+
         token = self.has_token(ctx)
         if not token:
             return result
 
-        return self.expire_check(token, result)
+        expire = self.expire_check(token)
+        if expire:
+            return expire
+
+        have_not_user = self.has_user(token)
+        if have_not_user:
+            return have_not_user
+        return result  # success
 
     @classmethod
     def has_token(cls, context):
@@ -31,7 +38,7 @@ class VerifyTokenAuthenticate(JSONWebToken):
         return _token[-1]
 
     @classmethod
-    def expire_check(cls, token: str, result):
+    def expire_check(cls, token: str):
         now = int(timezone.now().timestamp())
         exp = cls.extra_data(token).get('exp', 0)
         if exp <= now:
@@ -40,7 +47,16 @@ class VerifyTokenAuthenticate(JSONWebToken):
                 'name': 'UNAUTHENTICATED',
                 'message': 'Authentication Error',
             })
-        return result
+
+    @classmethod
+    def has_user(cls, token: str):
+        uid = cls.extra_data(token).get('uid', 0)
+        if uid == 0:
+            return GraphQLError('AuthenticationError', extensions={
+                'code': 401,
+                'name': 'UNAUTHENTICATED',
+                'message': 'Authentication Error',
+            })
 
 
 """

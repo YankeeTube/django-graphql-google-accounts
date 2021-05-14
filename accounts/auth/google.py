@@ -85,7 +85,7 @@ class GoogleProviderCallback(GoogleProviderToken, JSONWebToken):
         self.request = request
 
         query_string = self.save()
-        redirect_url = f"{settings.LOGIN_REDIRECT_URL}?{query_string}"
+        redirect_url = f"{CONFIG.get('front_redirect_uri', '/')}?{query_string}"
 
         kwargs.update({'redirect_url': redirect_url})
         dispatch = self.func(request, *args, **kwargs)
