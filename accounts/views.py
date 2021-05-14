@@ -1,7 +1,9 @@
-from django.views.generic import View
 from django.http.response import HttpResponseRedirect
+from django.views.generic import View
+
 from accounts.auth.google import GoogleProviderLogin
-from accounts.auth.decorators import google_provider_callback_save
+from accounts.decorators.define import google_provider_callback_save
+
 
 # Create your views here.
 
