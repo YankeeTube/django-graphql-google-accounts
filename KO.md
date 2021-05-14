@@ -48,9 +48,9 @@ ACCOUNTS_SETTINGS = {
     # change secret example: https://djecrety.ir/
     'token_secret': '^yb9tjg_hif0jym(d42j=vc#kyy=e_t#bjs)xy9y9)=tf&)!-2',
     'claim': {
-        'iss': '',  # issuer
-        'sub': '',  # subject
-        'aud': '',  # audience
+        'iss': '',  # 발급자
+        'sub': '',  # 제목
+        'aud': '',  # 대상
         'exp': 1800,  # accessToken expire time seconds
     },
     'refresh_token_expire': 30,  # days / only verify check day
