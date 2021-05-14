@@ -1,7 +1,6 @@
 from django.utils import timezone
-from django.utils.decorators import method_decorator
+
 from accounts.auth.token import JSONWebToken
-from accounts.auth.google import GoogleProviderCallback
 from accounts.response import ERROR_RESPONSE
 
 
@@ -51,10 +50,3 @@ class VerifyTokenAuthenticate(JSONWebToken):
         if uid == 0:
             return False
         return True
-
-
-"""
-    Google Accounts Class Based Decorator Defined
-"""
-google_provider_callback_save = method_decorator(GoogleProviderCallback)
-login_required = VerifyTokenAuthenticate

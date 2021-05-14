@@ -109,7 +109,7 @@ verify accessToken timeout and `uid`
 ```python3
 import graphene
 # from example.types import ExampleType
-from accounts.auth.decorators import login_required
+from accounts.decorators.define import login_required
 
 
 class ExampleQuery:

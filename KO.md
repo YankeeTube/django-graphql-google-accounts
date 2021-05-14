@@ -109,7 +109,7 @@ accessToken 만료와 `uid`를 소유하고 있는지 검사합니다.
 ```python3
 import graphene
 # from example.types import ExampleType
-from accounts.auth.decorators import login_required
+from accounts.decorators.define import login_required
 
 
 class ExampleQuery:
