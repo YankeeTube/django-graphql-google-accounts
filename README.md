@@ -4,9 +4,11 @@
 fk django allauth creates 7 tables.  
 but we need only google accounts and we will only use graphql token authentication.
 
-<span style="color:red">WARNING</span>  
-Create a user table that uses only Google accounts.  
-Use is not recommended unless it is the initial setting.
+```diff
+@@ WARNING @@
++ Create a user table that uses only Google accounts.  
++ Use is not recommended unless it is the initial setting.
+```  
 
 ### Table Columns
 | column     |
@@ -136,3 +138,8 @@ class ExampleQuery:
     def resolve_example():
         return example.objects.all()
 ```
+
+### Admin
+
+default password is email  
+If the password is empty, save email automatically by django pbk2 encryption.
