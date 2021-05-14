@@ -1,7 +1,9 @@
 import jwt
 from django.conf import settings
-from django.utils import timezone
 from django.core.management.utils import get_random_secret_key
+from django.utils import timezone
+
+from accounts.response import INVALID_SIGNATURE_RESPONSE
 
 SECRET_KEY = settings.ACCOUNTS_SETTINGS.get('token_secret', '')
 CLAIM = settings.ACCOUNTS_SETTINGS.get('claim', {})
@@ -23,6 +25,18 @@ class JWTWithoutSignature:
         return jwt.decode(token, options={'verify_signature': False})
 
 
+class JWTWithSignatureDecode:
+
+    @staticmethod
+    def _decode(token: str) -> dict:
+        try:
+            return jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        except jwt.InvalidSignatureError:
+            return INVALID_SIGNATURE_RESPONSE
+        except jwt.DecodeError:
+            return INVALID_SIGNATURE_RESPONSE
+
+
 class JWTMakeToken:
     """
     [RFC-7519] - Registered Claim Names
@@ -38,14 +52,21 @@ class JWTMakeToken:
     @staticmethod
     def _access_token(**kwargs) -> str:
         iat, exp = TokenTime().__call__(**{'exp': CLAIM.get('exp', 1800)})
+        iss = CLAIM.get('iss', 'django')  # Issuer / 발급자
+        sub = CLAIM.get('sub', '')  # Subject / 제목
+        aud = CLAIM.get('aud', '')  # Audience / 대상
         claim = {
-            'iss': CLAIM.get('iss', 'django'),  # Issuer / 발급자
-            'sub': CLAIM.get('sub', ''),  # Subject / 제목
-            'aud': CLAIM.get('aud', ''),  # Audience / 대상
             'exp': exp,  # Expiration Time / 만료 시간(unix timestamp)
             'iat': iat,  # Issued At / 발급 시간
             **kwargs,
         }
+        if iss:
+            claim.update({'iss': iss})
+        if sub:
+            claim.update({'sub': sub})
+        if aud:
+            claim.update({'aud': aud})
+
         return jwt.encode(claim, key=SECRET_KEY, algorithm='HS256')
 
     @staticmethod
@@ -57,7 +78,7 @@ class JWTMakeToken:
         return get_random_secret_key()
 
 
-class JSONWebToken(JWTMakeToken, JWTWithoutSignature):
+class JSONWebToken(JWTMakeToken, JWTWithoutSignature, JWTWithSignatureDecode):
 
     def __str__(self):
         return 'JSON Web Token Management'
@@ -72,4 +93,4 @@ class JSONWebToken(JWTMakeToken, JWTWithoutSignature):
         if len(_token) == 1:
             return {}
 
-        return cls.extra_data(_token[1])
+        return cls._decode(_token[1])

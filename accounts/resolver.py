@@ -1,11 +1,13 @@
 import graphene
 from django.conf import settings
-from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from graphene import Field, Int
+
+from accounts.auth.token import JSONWebToken
+from accounts.decorators.define import login_required
 from accounts.models import RefreshTokens
 from accounts.types import UserType
-from accounts.auth.token import JSONWebToken
 
 EXPIRE_DAYS = settings.ACCOUNTS_SETTINGS.get('refresh_token_expire', 30)
 
@@ -14,6 +16,7 @@ class UserQuery:
     user = Field(UserType, id=Int())
 
     @staticmethod
+    @login_required
     def resolve_user(root, info, id: str):
         return get_user_model().objects.get(pk=id)
 

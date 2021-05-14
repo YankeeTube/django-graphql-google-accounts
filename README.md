@@ -79,12 +79,27 @@ urlpatterns = [
 ]
 ```
 
-
 ### Refresh Token
 
 #### Mutate
 
+###### Register Schema
+
+```python3
+# schema.py
+import graphene
+from accounts.resolver import UserQuery, RefreshTokenMutation
+
+
+class Mutation(graphene.ObjectType):
+    refresh_token = RefreshTokenMutation.Field()
+
+
+schema = graphene.Schema(mutation=Mutation)
+```
+
 ###### HTTP Headers
+
 ```json
 {
   "Authorization": "Bearer <accessToken>"
@@ -92,6 +107,7 @@ urlpatterns = [
 ```
 
 ###### Mutation
+
 ```graphql
 mutation {
   refreshToken(token: "=0ujbayhl43l6m=vleqpa#&k(jaqlv0-p&qn7jl1#*nv@%v&=+") {
