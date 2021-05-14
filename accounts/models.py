@@ -29,7 +29,7 @@ class User(AbstractBaseUser):
     uid = models.CharField(max_length=100, unique=True, blank=True, null=True, help_text='Google provider uid')
     email = models.EmailField(max_length=255, unique=True, blank=False, null=False)
     password = models.CharField(max_length=128)
-    nickname = models.CharField(max_length=20, null=True, blank=True, unique=True)
+    nickname = models.CharField(max_length=100, null=True, blank=True, unique=True)
     picture = models.CharField(max_length=255, blank=True, null=True, help_text='Google Profile Thumbnail')
     locale = models.CharField(max_length=4, default='ko', blank=True, null=True)
     is_active = models.BooleanField(default=True)
