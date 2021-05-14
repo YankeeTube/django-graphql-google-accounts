@@ -2,7 +2,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from accounts.auth.token import JSONWebToken
 from accounts.auth.google import GoogleProviderCallback
-from graphql import GraphQLError
+from accounts.response import ERROR_RESPONSE
 
 
 class VerifyTokenAuthenticate(JSONWebToken):
@@ -20,43 +20,37 @@ class VerifyTokenAuthenticate(JSONWebToken):
 
         token = self.has_token(ctx)
         if not token:
-            return result
+            return ERROR_RESPONSE
 
         expire = self.expire_check(token)
-        if expire:
-            return expire
+        if not expire:
+            return ERROR_RESPONSE
 
         have_not_user = self.has_user(token)
-        if have_not_user:
-            return have_not_user
+        if not have_not_user:
+            return ERROR_RESPONSE
         return result  # success
 
     @classmethod
-    def has_token(cls, context):
+    def has_token(cls, context) -> str:
         bearer_token = context.META.get('HTTP_AUTHORIZATION', '')
         _token = bearer_token.split('Bearer ')
         return _token[-1]
 
     @classmethod
-    def expire_check(cls, token: str):
+    def expire_check(cls, token: str) -> bool:
         now = int(timezone.now().timestamp())
         exp = cls.extra_data(token).get('exp', 0)
         if exp <= now:
-            return GraphQLError('AuthenticationError', extensions={
-                'code': 401,
-                'name': 'UNAUTHENTICATED',
-                'message': 'Authentication Error',
-            })
+            return False
+        return True
 
     @classmethod
-    def has_user(cls, token: str):
+    def has_user(cls, token: str) -> bool:
         uid = cls.extra_data(token).get('uid', 0)
         if uid == 0:
-            return GraphQLError('AuthenticationError', extensions={
-                'code': 401,
-                'name': 'UNAUTHENTICATED',
-                'message': 'Authentication Error',
-            })
+            return False
+        return True
 
 
 """

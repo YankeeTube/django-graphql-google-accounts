@@ -22,3 +22,5 @@ setup(
         'graphene_django',
     ],
 )
+# python setup.py bdsit_wheel
+# twine upload dist/django_graphql_google_accounts-0.2-py3-none-any.whl
