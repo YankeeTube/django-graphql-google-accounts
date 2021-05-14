@@ -17,7 +17,7 @@ setup(
 
     install_requires=[
         'django',
-        'jwt',
+        'PyJWT',
         'requests',
         'graphene',
         'graphene_django',
