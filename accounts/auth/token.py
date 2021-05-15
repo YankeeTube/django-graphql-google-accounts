@@ -3,7 +3,7 @@ from django.conf import settings
 from django.core.management.utils import get_random_secret_key
 from django.utils import timezone
 
-from accounts.response import INVALID_SIGNATURE_RESPONSE
+from accounts.response import INVALID_SIGNATURE_RESPONSE, TOKEN_EXPIRE_RESPONSE
 
 SECRET_KEY = settings.ACCOUNTS_SETTINGS.get('token_secret', '')
 CLAIM = settings.ACCOUNTS_SETTINGS.get('claim', {})
@@ -31,6 +31,8 @@ class JWTWithSignatureDecode:
     def _decode(token: str) -> dict:
         try:
             return jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return TOKEN_EXPIRE_RESPONSE
         except jwt.InvalidSignatureError:
             return INVALID_SIGNATURE_RESPONSE
         except jwt.DecodeError:
@@ -93,4 +95,4 @@ class JSONWebToken(JWTMakeToken, JWTWithoutSignature, JWTWithSignatureDecode):
         if len(_token) == 1:
             return {}
 
-        return cls._decode(_token[1])
+        return cls.extra_data(_token[1])

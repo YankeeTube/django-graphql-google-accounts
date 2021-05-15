@@ -1,7 +1,7 @@
 from django.utils import timezone
 
 from accounts.auth.token import JSONWebToken
-from accounts.response import TOKEN_EXPIRE_RESPONSE, INVALID_SIGNATURE_RESPONSE
+from accounts.response import TOKEN_EXPIRE_RESPONSE
 
 
 class VerifyTokenAuthenticate(JSONWebToken):
@@ -21,8 +21,9 @@ class VerifyTokenAuthenticate(JSONWebToken):
         if not token:
             return TOKEN_EXPIRE_RESPONSE
 
-        if not self.check_signature(token):
-            return INVALID_SIGNATURE_RESPONSE
+        response = self.check_signature(token)
+        if response is not True:
+            return response
 
         expire = self.expire_check(token)
         if not expire:
@@ -44,7 +45,7 @@ class VerifyTokenAuthenticate(JSONWebToken):
         obj = cls._decode(token)
         if isinstance(obj, dict):
             return True
-        return False
+        return obj
 
     @classmethod
     def expire_check(cls, token: str) -> bool:
