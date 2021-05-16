@@ -21,6 +21,6 @@ class TokenMiddleware(JSONWebToken):
         if _authenticate(ctx):
             token = has_token(ctx)
             claim = self.extra_data(token)
-            user = authenticate(request=ctx, email=claim.get('aud', ''))
+            user = authenticate(request=ctx, uid=claim.get('uid', ''))
             ctx.user = user
         return next(root, info, **kwargs)

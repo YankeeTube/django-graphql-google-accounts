@@ -59,19 +59,15 @@ class JWTMakeToken:
         iat, exp = TokenTime().__call__(exp=CLAIM.get('exp', 1800))
         iss = CLAIM.get('iss', 'django')  # Issuer / 발급자
         sub = CLAIM.get('sub', '')  # Subject / 제목
-        aud = CLAIM.get('aud', '')  # Audience / 대상
         claim = {
             'exp': exp,  # Expiration Time / 만료 시간(unix timestamp)
             'iat': iat,  # Issued At / 발급 시간
-            **kwargs,
         }
         if iss:
             claim.update({'iss': iss})
         if sub:
             claim.update({'sub': sub})
-        if aud:
-            claim.update({'aud': aud})
-
+        claim.update(**kwargs)
         return jwt.encode(claim, key=SECRET_KEY, algorithm='HS256')
 
     @staticmethod

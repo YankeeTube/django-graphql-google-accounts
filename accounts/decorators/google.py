@@ -58,16 +58,16 @@ class GoogleProviderCallback(GoogleProviderToken, JSONWebToken):
         profiles = self.extra_data(id_token)
         defaults: dict = self.save_user(profiles)
 
-        email = profiles.get('email', '')
-        access_token = self._access_token(uid=defaults.get('id', 0), aud=email)
+        uid = profiles.get('sub', '')
+        access_token = self._access_token(id=defaults.get('id', 0), uid=uid)
         refresh_token = self._refresh_token()
         self.save_refresh_token(refresh_token)
-        user = authenticate(email=email)
+        user = authenticate(uid=uid)
         login(self.request, user)
 
         return urlencode({
             **defaults,
-            'email': email,
+            'email': profiles.get('email', ''),
             'accessToken': access_token,
             'refreshToken': refresh_token,
         })

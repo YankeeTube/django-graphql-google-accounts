@@ -6,12 +6,12 @@ from django.core.exceptions import ObjectDoesNotExist
 class GoogleAuthBackend(BaseBackend):
     model = get_user_model()
 
-    def authenticate(self, request, email=None):
-        if not email:
+    def authenticate(self, request, uid=None):
+        if not uid:
             return None
 
         try:
-            user = self.model.objects.get(email=email)
+            user = self.model.objects.get(uid=uid)
             return user
         except ObjectDoesNotExist:
             return None
@@ -19,9 +19,9 @@ class GoogleAuthBackend(BaseBackend):
             print(str(e))
             return None
 
-    def get_user(self, uid):
+    def get_user(self, _id):
         try:
-            return self.model.objects.get(pk=uid)
+            return self.model.objects.get(pk=_id)
         except ObjectDoesNotExist:
             return None
         except Exception as e:

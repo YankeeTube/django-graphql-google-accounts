@@ -42,7 +42,10 @@ class RefreshTokenMutation(graphene.Mutation, JSONWebToken):
             obj.delete()
             _token = cls._refresh_token()
             claim = cls.get_info_token(info)
-            access_token = cls._access_token(uid=claim.get('id', 0), aud=claim.get('email', ''))
+            access_token = cls._access_token(
+                id=claim.get('id', 0),
+                uid=claim.get('uid', '')
+            )
             RefreshTokens.objects.create(refresh_token=_token)
             return RefreshTokenMutation(
                 ok=True,
