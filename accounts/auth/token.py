@@ -22,7 +22,10 @@ class JWTWithoutSignature:
 
     @staticmethod
     def extra_data(token: str) -> dict:
-        return jwt.decode(token, options={'verify_signature': False})
+        try:
+            return jwt.decode(token, options={'verify_signature': False})
+        except jwt.DecodeError:
+            return {}
 
 
 class JWTWithSignatureDecode:
