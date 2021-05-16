@@ -13,9 +13,9 @@ class VerifyTokenAuthenticate(JSONWebToken):
     def __init__(self, function):
         self.func = function
 
-    def __call__(self, root, info, *args, **kwargs):
-        result = self.func(root, info, *args, **kwargs)
-        ctx = info.context
+    def __call__(self, *args, **kwargs):
+        result = self.func(*args, **kwargs)
+        ctx = args[-1].context
 
         token = self.has_token(ctx)
         if not token:

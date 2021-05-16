@@ -1,7 +1,7 @@
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login
 
 from accounts.auth.google import GoogleProviderToken
 from accounts.auth.token import JSONWebToken
@@ -58,13 +58,16 @@ class GoogleProviderCallback(GoogleProviderToken, JSONWebToken):
         profiles = self.extra_data(id_token)
         defaults: dict = self.save_user(profiles)
 
-        access_token = self._access_token(**{'uid': defaults.get('id', 0)})
+        email = profiles.get('email', '')
+        access_token = self._access_token(uid=defaults.get('id', 0), aud=email)
         refresh_token = self._refresh_token()
         self.save_refresh_token(refresh_token)
+        user = authenticate(email=email)
+        login(self.request, user)
 
         return urlencode({
             **defaults,
-            'email': profiles.get('email', ''),
+            'email': email,
             'accessToken': access_token,
             'refreshToken': refresh_token,
         })

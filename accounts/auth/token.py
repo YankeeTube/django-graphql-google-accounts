@@ -53,7 +53,7 @@ class JWTMakeToken:
 
     @staticmethod
     def _access_token(**kwargs) -> str:
-        iat, exp = TokenTime().__call__(**{'exp': CLAIM.get('exp', 1800)})
+        iat, exp = TokenTime().__call__(exp=CLAIM.get('exp', 1800))
         iss = CLAIM.get('iss', 'django')  # Issuer / 발급자
         sub = CLAIM.get('sub', '')  # Subject / 제목
         aud = CLAIM.get('aud', '')  # Audience / 대상

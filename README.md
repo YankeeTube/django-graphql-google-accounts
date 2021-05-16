@@ -63,6 +63,12 @@ ACCOUNTS_SETTINGS = {
     }
 }
 
+GRAPHENE = {
+    "SCHEMA": "core.schema.schema",
+    'MIDDLEWARE': [
+        'accounts.middleware.TokenMiddleware'
+    ]
+}
 
 AUTH_USER_MODEL = 'accounts.User'
 ```
