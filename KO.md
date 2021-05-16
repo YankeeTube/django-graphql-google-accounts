@@ -43,6 +43,11 @@ INSTALLED_APPS = [
     'accounts',
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'accounts.auth.backend.GoogleAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # ...
 
 # Required!

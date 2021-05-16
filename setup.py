@@ -24,4 +24,4 @@ setup(
     ],
 )
 # python setup.py bdist_wheel
-# twine upload dist/django_graphql_google_accounts-0.4.3-py3-none-any.whl
+# twine upload dist/django_graphql_google_accounts-0.4.4-py3-none-any.whl
