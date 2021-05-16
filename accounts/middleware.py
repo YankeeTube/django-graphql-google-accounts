@@ -10,7 +10,7 @@ def has_token(context):
 
 
 def _authenticate(request):
-    is_anonymous = not hasattr(request, 'user') or request.user.is_anonymous
+    is_anonymous = not hasattr(request, 'user') or request.user and request.user.is_anonymous
     return is_anonymous and has_token(request) is not None
 
 
