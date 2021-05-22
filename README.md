@@ -150,6 +150,58 @@ class ExampleQuery:
         return example.objects.all()
 ```
 
+### Logger (Authenticated Error) print ignore
+
+[graphene issue 513](https://github.com/graphql-python/graphene/issues/513#issuecomment-486313001)
+
+```python3
+import logging
+from graphql import GraphQLError
+
+
+class GraphQLLogFilter(logging.Filter):
+    """
+    Filter GraphQL errors that are intentional. See
+    https://github.com/graphql-python/graphene/issues/513
+    """
+
+    def filter(self, record):
+        if record.exc_info:
+            exc_type, _, _ = record.exc_info
+            if exc_type == GraphQLError:
+                return None
+        if record.stack_info and 'GraphQLError' in record.stack_info:
+            return None
+        if record.msg and 'GraphQLLocatedError' in record.msg:
+            return None
+        return True
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    # Prevent graphql exception from displaying in console
+    'filters': {
+        'graphql_log_filter': {
+            '()': GraphQLLogFilter,
+        }
+    },
+    'loggers': {
+        'graphql.execution.utils': {
+            'level': 'WARNING',
+            'handlers': ['console'],
+            'filters': ['graphql_log_filter'],
+        },
+    },
+}
+```
+
 ### Admin
 
 default password is email  

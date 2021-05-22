@@ -14,7 +14,6 @@ class VerifyTokenAuthenticate(JSONWebToken):
         self.func = function
 
     def __call__(self, *args, **kwargs):
-        result = self.func(*args, **kwargs)
         ctx = args[-1].context
 
         token = self.has_token(ctx)
@@ -32,7 +31,7 @@ class VerifyTokenAuthenticate(JSONWebToken):
         have_not_user = self.has_user(token)
         if not have_not_user:
             return TOKEN_EXPIRE_RESPONSE
-        return result  # success
+        return self.func(*args, **kwargs)  # success
 
     @classmethod
     def has_token(cls, context) -> str:
