@@ -19,6 +19,7 @@ class GoogleLoginView(GoogleProviderLogin, View):
         return HttpResponseRedirect(self.get_redirect_url())
 
 
+@google_provider_callback_save
 class GoogleCallbackView(View):
     """
     [PROCESS]
@@ -32,6 +33,5 @@ class GoogleCallbackView(View):
     )
     """
 
-    @google_provider_callback_save
     def dispatch(self, request, *args, **kwargs):
         return HttpResponseRedirect(kwargs.get('redirect_url', '/'))

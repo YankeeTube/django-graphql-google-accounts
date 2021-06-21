@@ -1,3 +1,5 @@
+import logging
+import sys
 from urllib.parse import urlencode
 
 import requests
@@ -5,7 +7,9 @@ from django.conf import settings
 
 from accounts.erros import TokenRequestFailed
 
+logger = logging.getLogger(__name__)
 CONFIG = settings.ACCOUNTS_SETTINGS.get('google', {})
+SCHEMA = settings.ACCOUNTS_SETTINGS.get('ssl-only', False)
 
 
 class GoogleProvider:
@@ -28,7 +32,7 @@ class GoogleProviderToken(GoogleProvider):
 
     def get_token(self):
         code = self.request.GET.dict().get('code', '')
-        host = f'{self.request.scheme}://{self.request.get_host()}'
+        host = f'{"https" if SCHEMA else self.request.scheme}://{self.request.get_host()}'
 
         resp = requests.post(self.TOKEN_URI, data={
             'grant_type': self.grant_type,
@@ -39,13 +43,16 @@ class GoogleProviderToken(GoogleProvider):
         })
         if resp.status_code == 200:
             return resp.json()
-        raise TokenRequestFailed
+        print(f'[Google_Token_Response]: {resp.text}')
+        logger.error(f'[Google_Token_Response]: {resp.text}')
+        sys.stdout.flush()
+        raise TokenRequestFailed(resp.text)
 
 
 class GoogleProviderLogin(GoogleProvider):
 
     def get_redirect_url(self):
-        host = self.request.build_absolute_uri().replace(self.request.path, '')
+        host = f'{"https" if SCHEMA else self.request.scheme}://{self.request.get_host()}'
         query = urlencode({
             'client_id': self.client_id,
             'redirect_uri': f"{host}{self.redirect_uri}",

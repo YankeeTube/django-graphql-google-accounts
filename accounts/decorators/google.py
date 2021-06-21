@@ -1,7 +1,10 @@
+import random
+import string
 from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib.auth import get_user_model, authenticate, login
+from django.db.utils import IntegrityError
 
 from accounts.auth.google import GoogleProviderToken
 from accounts.auth.token import JSONWebToken
@@ -42,10 +45,18 @@ class GoogleProviderCallback(GoogleProviderToken, JSONWebToken):
             'locale': profiles.get('locale', ''),
             'picture': profiles.get('picture', ''),
         }
-        obj, _ = get_user_model().objects.update_or_create(
-            email=profiles.get('email', ''),
-            defaults=defaults
-        )
+        try:
+            obj, _ = get_user_model().objects.update_or_create(
+                email=profiles.get('email', ''),
+                defaults=defaults
+            )
+        except IntegrityError:
+            rand_string = ''.join(random.choices(list(string.hexdigits), k=8))
+            defaults['nickname'] = f"{profiles.get('name', '')}_{rand_string}"
+            obj, _ = get_user_model().objects.update_or_create(
+                email=profiles.get('email', ''),
+                defaults=defaults
+            )
         defaults.update({'id': obj.id})
         return defaults
 

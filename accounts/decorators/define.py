@@ -6,5 +6,15 @@ from accounts.decorators.token import VerifyTokenAuthenticate
 """
     Google Accounts Class Based Decorator Defined
 """
-google_provider_callback_save = method_decorator(GoogleProviderCallback)
+
+
+def callback_google_provider(func):
+    def wrapper(request, *args, **kwargs):
+        g = GoogleProviderCallback(func)
+        return g(request, *args, **kwargs)
+
+    return wrapper
+
+
+google_provider_callback_save = method_decorator(callback_google_provider, name='dispatch')
 login_required = VerifyTokenAuthenticate

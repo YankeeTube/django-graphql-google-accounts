@@ -1,7 +1,10 @@
 class TokenRequestFailed(Exception):
 
+    def __init__(self, value):
+        self.value = value
+
     def __str__(self):
-        return 'Google get token load failed ...'
+        return f'Google get token load failed ...{self.value}'
 
 
 class NotFoundIDToken(Exception):
