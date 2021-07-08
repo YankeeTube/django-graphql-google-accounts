@@ -63,6 +63,10 @@ class User(AbstractBaseUser):
         return self.is_admin
 
     @property
+    def is_superuser(self):
+        return self.is_admin
+
+    @property
     def nickname(self):
         if self._nickname:
             return self._nickname
