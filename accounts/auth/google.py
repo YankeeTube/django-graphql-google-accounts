@@ -25,7 +25,7 @@ class GoogleProvider:
         self.grant_type = 'authorization_code'
         self.response_type = 'code'
         self.access_type = 'offline'
-        self.scope = 'https://www.googleapis.com/auth/userinfo.email'
+        self.scope = 'https://www.googleapis.com/auth/userinfo.profile'
 
 
 class GoogleProviderToken(GoogleProvider):
